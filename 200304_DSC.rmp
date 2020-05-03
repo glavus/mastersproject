@@ -1,0 +1,2400 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="7.5.003">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="7.5.003" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="68" name="Get Data" width="90" x="45" y="85">
+        <process expanded="true">
+          <operator activated="true" class="read_excel" compatibility="7.5.003" expanded="true" height="68" name="website list" width="90" x="45" y="136">
+            <parameter key="excel_file" value="/Users/169495/Documents/list_websites_scrape.xlsx"/>
+            <parameter key="sheet_number" value="1"/>
+            <parameter key="imported_cell_range" value="A1:A12"/>
+            <parameter key="encoding" value="SYSTEM"/>
+            <parameter key="first_row_as_names" value="false"/>
+            <list key="annotations">
+              <parameter key="0" value="Name"/>
+            </list>
+            <parameter key="date_format" value=""/>
+            <parameter key="time_zone" value="SYSTEM"/>
+            <parameter key="locale" value="English (United States)"/>
+            <list key="data_set_meta_data_information">
+              <parameter key="0" value="website.true.polynominal.attribute"/>
+            </list>
+            <parameter key="read_not_matching_values_as_missings" value="true"/>
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+          </operator>
+          <operator activated="true" class="concurrency:loop_values" compatibility="7.5.003" expanded="true" height="82" name="gram generation (2)" width="90" x="179" y="136">
+            <parameter key="attribute" value="website"/>
+            <parameter key="iteration_macro" value="websites_loop"/>
+            <parameter key="reuse_results" value="false"/>
+            <parameter key="enable_parallel_execution" value="true"/>
+            <process expanded="true">
+              <operator activated="true" class="web:crawl_web_modern" compatibility="7.3.000" expanded="true" height="68" name="Crawl Web (3)" width="90" x="45" y="34">
+                <parameter key="url" value="%{websites_loop}"/>
+                <list key="crawling_rules"/>
+                <parameter key="max_crawl_depth" value="1"/>
+                <parameter key="retrieve_as_html" value="false"/>
+                <parameter key="enable_basic_auth" value="false"/>
+                <parameter key="add_content_as_attribute" value="false"/>
+                <parameter key="write_pages_to_disk" value="false"/>
+                <parameter key="include_binary_content" value="false"/>
+                <parameter key="output_file_extension" value="txt"/>
+                <parameter key="max_pages" value="100"/>
+                <parameter key="max_page_size" value="1000"/>
+                <parameter key="delay" value="100"/>
+                <parameter key="max_concurrent_connections" value="100"/>
+                <parameter key="max_connections_per_host" value="50"/>
+                <parameter key="user_agent" value="rapidminer-web-mining-extension-crawler"/>
+                <parameter key="ignore_robot_exclusion" value="false"/>
+              </operator>
+              <operator activated="true" class="concurrency:loop_values" compatibility="7.5.003" expanded="true" height="82" name="Loop Values (2)" width="90" x="179" y="34">
+                <parameter key="attribute" value="Link"/>
+                <parameter key="iteration_macro" value="loop_web"/>
+                <parameter key="reuse_results" value="false"/>
+                <parameter key="enable_parallel_execution" value="true"/>
+                <process expanded="true">
+                  <operator activated="true" class="handle_exception" compatibility="7.5.003" expanded="true" height="82" name="Handle Exception (3)" width="90" x="112" y="34">
+                    <process expanded="true">
+                      <operator activated="true" class="web:get_webpage" compatibility="7.3.000" expanded="true" height="68" name="Get Page (3)" width="90" x="45" y="34">
+                        <parameter key="url" value="%{loop_web}"/>
+                        <parameter key="random_user_agent" value="false"/>
+                        <parameter key="connection_timeout" value="10000"/>
+                        <parameter key="read_timeout" value="10000"/>
+                        <parameter key="follow_redirects" value="true"/>
+                        <parameter key="accept_cookies" value="none"/>
+                        <parameter key="cookie_scope" value="global"/>
+                        <parameter key="request_method" value="GET"/>
+                        <list key="query_parameters"/>
+                        <list key="request_properties"/>
+                        <parameter key="override_encoding" value="false"/>
+                        <parameter key="encoding" value="SYSTEM"/>
+                      </operator>
+                      <operator activated="false" class="retrieve" compatibility="7.5.003" expanded="true" height="68" name="Retrieve (3)" width="90" x="112" y="697">
+                        <parameter key="repository_entry" value="//Local Repository/processes/steyertest2data"/>
+                      </operator>
+                      <operator activated="true" class="text:process_documents" compatibility="7.5.000" expanded="true" height="103" name="Process Documents (3)" width="90" x="246" y="34">
+                        <parameter key="create_word_vector" value="true"/>
+                        <parameter key="vector_creation" value="Term Frequency"/>
+                        <parameter key="add_meta_information" value="false"/>
+                        <parameter key="keep_text" value="false"/>
+                        <parameter key="prune_method" value="none"/>
+                        <parameter key="prune_below_percent" value="3.0"/>
+                        <parameter key="prune_above_percent" value="30.0"/>
+                        <parameter key="prune_below_rank" value="0.05"/>
+                        <parameter key="prune_above_rank" value="0.95"/>
+                        <parameter key="datamanagement" value="double_sparse_array"/>
+                        <parameter key="data_management" value="auto"/>
+                        <process expanded="true">
+                          <operator activated="true" class="text:tokenize" compatibility="7.5.000" expanded="true" height="68" name="Tokenize (3)" width="90" x="45" y="34">
+                            <parameter key="mode" value="non letters"/>
+                            <parameter key="characters" value=".:"/>
+                            <parameter key="language" value="English"/>
+                            <parameter key="max_token_length" value="3"/>
+                          </operator>
+                          <operator activated="true" class="text:stem_snowball" compatibility="7.5.000" expanded="true" height="68" name="Stem (6)" width="90" x="179" y="34">
+                            <parameter key="language" value="English"/>
+                          </operator>
+                          <operator activated="true" class="text:stem_porter" compatibility="7.5.000" expanded="true" height="68" name="Stem (7)" width="90" x="313" y="34"/>
+                          <operator activated="true" class="text:stem_lovins" compatibility="7.5.000" expanded="true" height="68" name="Stem (8)" width="90" x="447" y="34"/>
+                          <operator activated="true" class="text:stem_arabic" compatibility="7.5.000" expanded="true" height="68" name="Stem (9)" width="90" x="581" y="34"/>
+                          <operator activated="true" class="text:filter_stopwords_english" compatibility="7.5.000" expanded="true" height="68" name="Filter Stopwords (4)" width="90" x="45" y="187"/>
+                          <operator activated="true" class="text:filter_stopwords_arabic" compatibility="7.5.000" expanded="true" height="68" name="Filter Stopwords (5)" width="90" x="179" y="187"/>
+                          <operator activated="true" class="text:generate_n_grams_terms" compatibility="7.5.000" expanded="true" height="68" name="Generate n-Grams (3)" width="90" x="313" y="187">
+                            <parameter key="max_length" value="5"/>
+                          </operator>
+                          <connect from_port="document" to_op="Tokenize (3)" to_port="document"/>
+                          <connect from_op="Tokenize (3)" from_port="document" to_op="Stem (6)" to_port="document"/>
+                          <connect from_op="Stem (6)" from_port="document" to_op="Stem (7)" to_port="document"/>
+                          <connect from_op="Stem (7)" from_port="document" to_op="Stem (8)" to_port="document"/>
+                          <connect from_op="Stem (8)" from_port="document" to_op="Stem (9)" to_port="document"/>
+                          <connect from_op="Stem (9)" from_port="document" to_op="Filter Stopwords (4)" to_port="document"/>
+                          <connect from_op="Filter Stopwords (4)" from_port="document" to_op="Filter Stopwords (5)" to_port="document"/>
+                          <connect from_op="Filter Stopwords (5)" from_port="document" to_op="Generate n-Grams (3)" to_port="document"/>
+                          <connect from_op="Generate n-Grams (3)" from_port="document" to_port="document 1"/>
+                          <portSpacing port="source_document" spacing="0"/>
+                          <portSpacing port="sink_document 1" spacing="0"/>
+                          <portSpacing port="sink_document 2" spacing="0"/>
+                        </process>
+                      </operator>
+                      <operator activated="true" class="transpose" compatibility="7.5.003" expanded="true" height="82" name="Transpose (3)" width="90" x="380" y="34"/>
+                      <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (11)" width="90" x="514" y="34">
+                        <parameter key="old_name" value="id"/>
+                        <parameter key="new_name" value="word"/>
+                        <list key="rename_additional_attributes">
+                          <parameter key="att_1" value="frequency"/>
+                        </list>
+                      </operator>
+                      <connect from_op="Get Page (3)" from_port="output" to_op="Process Documents (3)" to_port="documents 1"/>
+                      <connect from_op="Process Documents (3)" from_port="example set" to_op="Transpose (3)" to_port="example set input"/>
+                      <connect from_op="Transpose (3)" from_port="example set output" to_op="Rename (11)" to_port="example set input"/>
+                      <connect from_op="Rename (11)" from_port="example set output" to_port="out 1"/>
+                      <portSpacing port="source_in 1" spacing="0"/>
+                      <portSpacing port="source_in 2" spacing="0"/>
+                      <portSpacing port="sink_out 1" spacing="0"/>
+                      <portSpacing port="sink_out 2" spacing="0"/>
+                    </process>
+                    <process expanded="true">
+                      <connect from_port="in 1" to_port="out 1"/>
+                      <portSpacing port="source_in 1" spacing="0"/>
+                      <portSpacing port="source_in 2" spacing="0"/>
+                      <portSpacing port="sink_out 1" spacing="0"/>
+                      <portSpacing port="sink_out 2" spacing="0"/>
+                    </process>
+                  </operator>
+                  <connect from_op="Handle Exception (3)" from_port="out 1" to_port="output 1"/>
+                  <portSpacing port="source_input 1" spacing="0"/>
+                  <portSpacing port="source_input 2" spacing="0"/>
+                  <portSpacing port="sink_output 1" spacing="0"/>
+                  <portSpacing port="sink_output 2" spacing="0"/>
+                </process>
+              </operator>
+              <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="82" name="Append (6)" width="90" x="313" y="34">
+                <parameter key="datamanagement" value="double_array"/>
+                <parameter key="data_management" value="auto"/>
+                <parameter key="merge_type" value="all"/>
+              </operator>
+              <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (3)" width="90" x="447" y="34">
+                <parameter key="use_default_aggregation" value="false"/>
+                <parameter key="attribute_filter_type" value="all"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value=""/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+                <parameter key="default_aggregation_function" value="average"/>
+                <list key="aggregation_attributes">
+                  <parameter key="frequency" value="sum"/>
+                </list>
+                <parameter key="group_by_attributes" value="word"/>
+                <parameter key="count_all_combinations" value="false"/>
+                <parameter key="only_distinct" value="false"/>
+                <parameter key="ignore_missings" value="true"/>
+              </operator>
+              <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (11)" width="90" x="581" y="34">
+                <list key="function_descriptions">
+                  <parameter key="Core_Website" value="%{websites_loop}"/>
+                </list>
+                <parameter key="keep_all" value="true"/>
+              </operator>
+              <operator activated="true" class="free_memory" compatibility="7.5.003" expanded="true" height="68" name="Free Memory (3)" width="90" x="112" y="187"/>
+              <connect from_op="Crawl Web (3)" from_port="example set" to_op="Loop Values (2)" to_port="input 1"/>
+              <connect from_op="Loop Values (2)" from_port="output 1" to_op="Append (6)" to_port="example set 1"/>
+              <connect from_op="Append (6)" from_port="merged set" to_op="Aggregate (3)" to_port="example set input"/>
+              <connect from_op="Aggregate (3)" from_port="example set output" to_op="Generate Attributes (11)" to_port="example set input"/>
+              <connect from_op="Generate Attributes (11)" from_port="example set output" to_port="output 1"/>
+              <portSpacing port="source_input 1" spacing="0"/>
+              <portSpacing port="source_input 2" spacing="0"/>
+              <portSpacing port="sink_output 1" spacing="0"/>
+              <portSpacing port="sink_output 2" spacing="0"/>
+            </process>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="82" name="Append (7)" width="90" x="313" y="136">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (12)" width="90" x="447" y="136">
+            <list key="function_descriptions">
+              <parameter key="Date" value="date_now()"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="retrieve" compatibility="7.5.003" expanded="true" height="68" name="Retrieve (6)" width="90" x="447" y="238">
+            <parameter key="repository_entry" value="//Local Repository/data/DSC_master"/>
+            <description align="left" color="transparent" colored="false" width="126">Old result list, gets over-written each algorithm run</description>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="103" name="Append (8)" width="90" x="581" y="136">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (13)" width="90" x="45" y="493">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="word.contains.sanders"/>
+              <parameter key="filters_entry_key" value="word.contains.buttigieg"/>
+              <parameter key="filters_entry_key" value="word.contains.trump"/>
+              <parameter key="filters_entry_key" value="word.contains.biden"/>
+              <parameter key="filters_entry_key" value="word.contains.klobuchar"/>
+              <parameter key="filters_entry_key" value="word.contains.steyer"/>
+              <parameter key="filters_entry_key" value="word.contains.bloomberg"/>
+              <parameter key="filters_entry_key" value="word.contains.warren"/>
+            </list>
+            <parameter key="filters_logic_and" value="false"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="store" compatibility="7.5.003" expanded="true" height="68" name="Store (2)" width="90" x="179" y="493">
+            <parameter key="repository_entry" value="//Local Repository/data/DSC_cand_filtered"/>
+          </operator>
+          <connect from_op="website list" from_port="output" to_op="gram generation (2)" to_port="input 1"/>
+          <connect from_op="gram generation (2)" from_port="output 1" to_op="Append (7)" to_port="example set 1"/>
+          <connect from_op="Append (7)" from_port="merged set" to_op="Generate Attributes (12)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (12)" from_port="example set output" to_op="Append (8)" to_port="example set 1"/>
+          <connect from_op="Retrieve (6)" from_port="output" to_op="Append (8)" to_port="example set 2"/>
+          <connect from_op="Append (8)" from_port="merged set" to_op="Filter Examples (13)" to_port="example set input"/>
+          <connect from_op="Filter Examples (13)" from_port="example set output" to_op="Store (2)" to_port="input"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <description align="center" color="yellow" colored="false" height="188" resized="true" width="137" x="154" y="54">Loops over new websites, handles text processing</description>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="82" name="Add Sentiment" width="90" x="45" y="340">
+        <process expanded="true">
+          <operator activated="true" class="retrieve" compatibility="7.5.003" expanded="true" height="68" name="sentiment wordlist" width="90" x="45" y="34">
+            <parameter key="repository_entry" value="../data/CDC_wordlist"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (14)" width="90" x="179" y="34">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="prior_polarity_score.ne.0"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="split" compatibility="7.5.003" expanded="true" height="82" name="Split (5)" width="90" x="313" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="# lemma#PoS"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="split_pattern" value="#"/>
+            <parameter key="split_mode" value="ordered_split"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (25)" width="90" x="447" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="# lemma#PoS_2"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (2)" width="90" x="581" y="34">
+            <parameter key="old_name" value="# lemma#PoS_1"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="split" compatibility="7.5.003" expanded="true" height="82" name="Split (6)" width="90" x="45" y="187">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="word"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="split_pattern" value="-"/>
+            <parameter key="split_mode" value="ordered_split"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (15)" width="90" x="179" y="187">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="word_2.is_missing."/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (26)" width="90" x="313" y="187">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="prior_polarity_score|word_1"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (12)" width="90" x="447" y="187">
+            <parameter key="old_name" value="word_1"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace (2)" width="90" x="581" y="187">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="word"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="_"/>
+            <parameter key="replace_by" value="-"/>
+          </operator>
+          <operator activated="true" class="split" compatibility="7.5.003" expanded="true" height="82" name="Split (7)" width="90" x="45" y="340">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="word"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="split_pattern" value="-"/>
+            <parameter key="split_mode" value="ordered_split"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (27)" width="90" x="179" y="340">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_1|prior_polarity_score"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (13)" width="90" x="313" y="340">
+            <parameter key="old_name" value="word_1"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="trim" compatibility="7.5.003" expanded="true" height="82" name="Trim (2)" width="90" x="447" y="340">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (4)" width="90" x="581" y="340">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="prior_polarity_score" value="average"/>
+            </list>
+            <parameter key="group_by_attributes" value="word"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (14)" width="90" x="581" y="442">
+            <parameter key="old_name" value="average(prior_polarity_score)"/>
+            <parameter key="new_name" value="sentiment"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <connect from_op="sentiment wordlist" from_port="output" to_op="Filter Examples (14)" to_port="example set input"/>
+          <connect from_op="Filter Examples (14)" from_port="example set output" to_op="Split (5)" to_port="example set input"/>
+          <connect from_op="Split (5)" from_port="example set output" to_op="Select Attributes (25)" to_port="example set input"/>
+          <connect from_op="Select Attributes (25)" from_port="example set output" to_op="Rename (2)" to_port="example set input"/>
+          <connect from_op="Rename (2)" from_port="example set output" to_op="Split (6)" to_port="example set input"/>
+          <connect from_op="Split (6)" from_port="example set output" to_op="Filter Examples (15)" to_port="example set input"/>
+          <connect from_op="Filter Examples (15)" from_port="example set output" to_op="Select Attributes (26)" to_port="example set input"/>
+          <connect from_op="Select Attributes (26)" from_port="example set output" to_op="Rename (12)" to_port="example set input"/>
+          <connect from_op="Rename (12)" from_port="example set output" to_op="Replace (2)" to_port="example set input"/>
+          <connect from_op="Replace (2)" from_port="example set output" to_op="Split (7)" to_port="example set input"/>
+          <connect from_op="Split (7)" from_port="example set output" to_op="Select Attributes (27)" to_port="example set input"/>
+          <connect from_op="Select Attributes (27)" from_port="example set output" to_op="Rename (13)" to_port="example set input"/>
+          <connect from_op="Rename (13)" from_port="example set output" to_op="Trim (2)" to_port="example set input"/>
+          <connect from_op="Trim (2)" from_port="example set output" to_op="Aggregate (4)" to_port="example set input"/>
+          <connect from_op="Aggregate (4)" from_port="example set output" to_op="Rename (14)" to_port="example set input"/>
+          <connect from_op="Rename (14)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="82" name="Enrich Data" width="90" x="45" y="238">
+        <process expanded="true">
+          <operator activated="true" class="retrieve" compatibility="7.5.003" expanded="true" height="68" name="Retrieve (2)" width="90" x="45" y="85">
+            <parameter key="repository_entry" value="//Local Repository/data/DSC_cand_filtered"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (13)" width="90" x="179" y="85">
+            <list key="function_descriptions">
+              <parameter key="Biden" value="contains([word],&quot;biden&quot;)"/>
+              <parameter key="Buttigieg" value="contains([word],&quot;buttigieg&quot;)"/>
+              <parameter key="Klobuchar" value="contains([word],&quot;klobuchar&quot;)"/>
+              <parameter key="Steyer" value="contains([word],&quot;steyer&quot;)"/>
+              <parameter key="Bloomberg" value="contains([word],&quot;bloomberg&quot;)"/>
+              <parameter key="Warren" value="contains([word],&quot;warren&quot;)"/>
+              <parameter key="Sanders" value="contains([word],&quot;sanders&quot;)"/>
+              <parameter key="Trump" value="contains([word],&quot;trump&quot;)"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="split" compatibility="7.5.003" expanded="true" height="82" name="Split (2)" width="90" x="179" y="187">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="word"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="split_pattern" value="_"/>
+            <parameter key="split_mode" value="ordered_split"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="166" name="Multiply (3)" width="90" x="179" y="340"/>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (2)" width="90" x="313" y="442">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_2|word_3|word_4|word_1"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (3)" width="90" x="447" y="442">
+            <parameter key="old_name" value="word_5"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (8)" width="90" x="313" y="340">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_2|word_3|word_5|word_1"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (9)" width="90" x="447" y="340">
+            <parameter key="old_name" value="word_4"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (28)" width="90" x="313" y="238">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_2|word_4|word_5|word_1"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (10)" width="90" x="447" y="238">
+            <parameter key="old_name" value="word_3"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (29)" width="90" x="313" y="136">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_3|word_4|word_5|word_1"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (18)" width="90" x="447" y="136">
+            <parameter key="old_name" value="word_2"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (30)" width="90" x="313" y="34">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="word_2|word_3|word_4|word_5"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (20)" width="90" x="447" y="34">
+            <parameter key="old_name" value="word_1"/>
+            <parameter key="new_name" value="word"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="166" name="Append (2)" width="90" x="581" y="340">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (2)" width="90" x="715" y="340">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="word.is_not_missing."/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <connect from_op="Retrieve (2)" from_port="output" to_op="Generate Attributes (13)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (13)" from_port="example set output" to_op="Split (2)" to_port="example set input"/>
+          <connect from_op="Split (2)" from_port="example set output" to_op="Multiply (3)" to_port="input"/>
+          <connect from_op="Multiply (3)" from_port="output 1" to_op="Select Attributes (30)" to_port="example set input"/>
+          <connect from_op="Multiply (3)" from_port="output 2" to_op="Select Attributes (29)" to_port="example set input"/>
+          <connect from_op="Multiply (3)" from_port="output 3" to_op="Select Attributes (28)" to_port="example set input"/>
+          <connect from_op="Multiply (3)" from_port="output 4" to_op="Select Attributes (8)" to_port="example set input"/>
+          <connect from_op="Multiply (3)" from_port="output 5" to_op="Select Attributes (2)" to_port="example set input"/>
+          <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Rename (3)" to_port="example set input"/>
+          <connect from_op="Rename (3)" from_port="example set output" to_op="Append (2)" to_port="example set 5"/>
+          <connect from_op="Select Attributes (8)" from_port="example set output" to_op="Rename (9)" to_port="example set input"/>
+          <connect from_op="Rename (9)" from_port="example set output" to_op="Append (2)" to_port="example set 4"/>
+          <connect from_op="Select Attributes (28)" from_port="example set output" to_op="Rename (10)" to_port="example set input"/>
+          <connect from_op="Rename (10)" from_port="example set output" to_op="Append (2)" to_port="example set 3"/>
+          <connect from_op="Select Attributes (29)" from_port="example set output" to_op="Rename (18)" to_port="example set input"/>
+          <connect from_op="Rename (18)" from_port="example set output" to_op="Append (2)" to_port="example set 2"/>
+          <connect from_op="Select Attributes (30)" from_port="example set output" to_op="Rename (20)" to_port="example set input"/>
+          <connect from_op="Rename (20)" from_port="example set output" to_op="Append (2)" to_port="example set 1"/>
+          <connect from_op="Append (2)" from_port="merged set" to_op="Filter Examples (2)" to_port="example set input"/>
+          <connect from_op="Filter Examples (2)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="103" name="Join &amp; Aggregate" width="90" x="179" y="238">
+        <process expanded="true">
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (2)" width="90" x="45" y="34">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="inner"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="word" value="word"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (2)" width="90" x="179" y="34">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="sentiment" value="average"/>
+              <parameter key="sentiment" value="count"/>
+              <parameter key="sentiment" value="median"/>
+            </list>
+            <parameter key="group_by_attributes" value="Biden|Buttigieg|Bloomberg|Sanders|Klobuchar|Trump|Steyer|Warren|Date"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="store" compatibility="7.5.003" expanded="true" height="68" name="Store (3)" width="90" x="313" y="34">
+            <parameter key="repository_entry" value="//Local Repository/data/DSC_web_agg"/>
+          </operator>
+          <connect from_port="in 1" to_op="Join (2)" to_port="left"/>
+          <connect from_port="in 2" to_op="Join (2)" to_port="right"/>
+          <connect from_op="Join (2)" from_port="join" to_op="Aggregate (2)" to_port="example set input"/>
+          <connect from_op="Aggregate (2)" from_port="example set output" to_op="Store (3)" to_port="input"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="source_in 3" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="103" name="Data ETL" width="90" x="45" y="544">
+        <process expanded="true">
+          <operator activated="true" class="retrieve" compatibility="7.5.003" expanded="true" height="68" name="Retrieve (4)" width="90" x="45" y="34">
+            <parameter key="repository_entry" value="//Local Repository/data/DSC_web_agg"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="229" name="Multiply (4)" width="90" x="179" y="34"/>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (3)" width="90" x="313" y="34">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Biden|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (3)" width="90" x="447" y="34">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Biden.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (2)" width="90" x="581" y="34">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Biden&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (4)" width="90" x="715" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Biden"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (5)" width="90" x="313" y="187">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Bloomberg|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (4)" width="90" x="447" y="187">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Bloomberg.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (14)" width="90" x="581" y="187">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Bloomberg&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (6)" width="90" x="715" y="187">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Bloomberg"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (7)" width="90" x="313" y="340">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Buttigieg|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (16)" width="90" x="447" y="340">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Buttigieg.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (15)" width="90" x="581" y="340">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Buttigieg&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (31)" width="90" x="715" y="340">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Buttigieg"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (32)" width="90" x="313" y="493">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Sanders|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (17)" width="90" x="447" y="493">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Sanders.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (16)" width="90" x="581" y="493">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Sanders&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (33)" width="90" x="715" y="493">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Sanders"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (34)" width="90" x="313" y="646">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Warren|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (18)" width="90" x="447" y="646">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Warren.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (17)" width="90" x="581" y="646">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Warren&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (35)" width="90" x="715" y="646">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Warren"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (36)" width="90" x="313" y="799">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Klobuchar|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (19)" width="90" x="447" y="799">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Klobuchar.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (18)" width="90" x="581" y="799">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Klobuchar&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (37)" width="90" x="715" y="799">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Klobuchar"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (38)" width="90" x="313" y="952">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Steyer|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (20)" width="90" x="447" y="952">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Steyer.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (19)" width="90" x="581" y="952">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Steyer&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (39)" width="90" x="715" y="952">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Steyer"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (40)" width="90" x="313" y="1105">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="average(sentiment)|count(sentiment)|Date|Trump|median(sentiment)"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (21)" width="90" x="447" y="1105">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Trump.contains.true"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (20)" width="90" x="581" y="1105">
+            <list key="function_descriptions">
+              <parameter key="Candidate" value="&quot;Trump&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (41)" width="90" x="715" y="1105">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Trump"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="229" name="Append (3)" width="90" x="849" y="34">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate" width="90" x="983" y="34">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="average(sentiment)" value="average"/>
+              <parameter key="median(sentiment)" value="average"/>
+              <parameter key="count(sentiment)" value="sum"/>
+            </list>
+            <parameter key="group_by_attributes" value="Candidate|Date"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename" width="90" x="1117" y="34">
+            <parameter key="old_name" value="average(average(sentiment))"/>
+            <parameter key="new_name" value="average_sentiment"/>
+            <list key="rename_additional_attributes">
+              <parameter key="average(median(sentiment))" value="median_sentiment"/>
+              <parameter key="sum(count(sentiment))" value="count_sentiment"/>
+            </list>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="103" name="Multiply (7)" width="90" x="1251" y="34"/>
+          <connect from_op="Retrieve (4)" from_port="output" to_op="Multiply (4)" to_port="input"/>
+          <connect from_op="Multiply (4)" from_port="output 1" to_op="Select Attributes (3)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 2" to_op="Select Attributes (5)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 3" to_op="Select Attributes (7)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 4" to_op="Select Attributes (32)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 5" to_op="Select Attributes (34)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 6" to_op="Select Attributes (36)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 7" to_op="Select Attributes (38)" to_port="example set input"/>
+          <connect from_op="Multiply (4)" from_port="output 8" to_op="Select Attributes (40)" to_port="example set input"/>
+          <connect from_op="Select Attributes (3)" from_port="example set output" to_op="Filter Examples (3)" to_port="example set input"/>
+          <connect from_op="Filter Examples (3)" from_port="example set output" to_op="Generate Attributes (2)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (2)" from_port="example set output" to_op="Select Attributes (4)" to_port="example set input"/>
+          <connect from_op="Select Attributes (4)" from_port="example set output" to_op="Append (3)" to_port="example set 1"/>
+          <connect from_op="Select Attributes (5)" from_port="example set output" to_op="Filter Examples (4)" to_port="example set input"/>
+          <connect from_op="Filter Examples (4)" from_port="example set output" to_op="Generate Attributes (14)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (14)" from_port="example set output" to_op="Select Attributes (6)" to_port="example set input"/>
+          <connect from_op="Select Attributes (6)" from_port="example set output" to_op="Append (3)" to_port="example set 2"/>
+          <connect from_op="Select Attributes (7)" from_port="example set output" to_op="Filter Examples (16)" to_port="example set input"/>
+          <connect from_op="Filter Examples (16)" from_port="example set output" to_op="Generate Attributes (15)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (15)" from_port="example set output" to_op="Select Attributes (31)" to_port="example set input"/>
+          <connect from_op="Select Attributes (31)" from_port="example set output" to_op="Append (3)" to_port="example set 3"/>
+          <connect from_op="Select Attributes (32)" from_port="example set output" to_op="Filter Examples (17)" to_port="example set input"/>
+          <connect from_op="Filter Examples (17)" from_port="example set output" to_op="Generate Attributes (16)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (16)" from_port="example set output" to_op="Select Attributes (33)" to_port="example set input"/>
+          <connect from_op="Select Attributes (33)" from_port="example set output" to_op="Append (3)" to_port="example set 4"/>
+          <connect from_op="Select Attributes (34)" from_port="example set output" to_op="Filter Examples (18)" to_port="example set input"/>
+          <connect from_op="Filter Examples (18)" from_port="example set output" to_op="Generate Attributes (17)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (17)" from_port="example set output" to_op="Select Attributes (35)" to_port="example set input"/>
+          <connect from_op="Select Attributes (35)" from_port="example set output" to_op="Append (3)" to_port="example set 5"/>
+          <connect from_op="Select Attributes (36)" from_port="example set output" to_op="Filter Examples (19)" to_port="example set input"/>
+          <connect from_op="Filter Examples (19)" from_port="example set output" to_op="Generate Attributes (18)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (18)" from_port="example set output" to_op="Select Attributes (37)" to_port="example set input"/>
+          <connect from_op="Select Attributes (37)" from_port="example set output" to_op="Append (3)" to_port="example set 6"/>
+          <connect from_op="Select Attributes (38)" from_port="example set output" to_op="Filter Examples (20)" to_port="example set input"/>
+          <connect from_op="Filter Examples (20)" from_port="example set output" to_op="Generate Attributes (19)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (19)" from_port="example set output" to_op="Select Attributes (39)" to_port="example set input"/>
+          <connect from_op="Select Attributes (39)" from_port="example set output" to_op="Append (3)" to_port="example set 7"/>
+          <connect from_op="Select Attributes (40)" from_port="example set output" to_op="Filter Examples (21)" to_port="example set input"/>
+          <connect from_op="Filter Examples (21)" from_port="example set output" to_op="Generate Attributes (20)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (20)" from_port="example set output" to_op="Select Attributes (41)" to_port="example set input"/>
+          <connect from_op="Select Attributes (41)" from_port="example set output" to_op="Append (3)" to_port="example set 8"/>
+          <connect from_op="Append (3)" from_port="merged set" to_op="Aggregate" to_port="example set input"/>
+          <connect from_op="Aggregate" from_port="example set output" to_op="Rename" to_port="example set input"/>
+          <connect from_op="Rename" from_port="example set output" to_op="Multiply (7)" to_port="input"/>
+          <connect from_op="Multiply (7)" from_port="output 1" to_port="out 1"/>
+          <connect from_op="Multiply (7)" from_port="output 2" to_port="out 2"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+          <portSpacing port="sink_out 3" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="82" name="sentiment viz" width="90" x="112" y="799">
+        <process expanded="true">
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (10)" width="90" x="179" y="34">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="average_sentiment" value="average"/>
+              <parameter key="median_sentiment" value="average"/>
+              <parameter key="count_sentiment" value="sum"/>
+            </list>
+            <parameter key="group_by_attributes" value="Candidate"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (30)" width="90" x="313" y="34">
+            <parameter key="old_name" value="average(average_sentiment)"/>
+            <parameter key="new_name" value="Average Sentiment"/>
+            <list key="rename_additional_attributes">
+              <parameter key="average(median_sentiment)" value="Median Sentiment"/>
+              <parameter key="sum(count_sentiment)" value="Media Volume"/>
+            </list>
+          </operator>
+          <connect from_port="in 1" to_op="Aggregate (10)" to_port="example set input"/>
+          <connect from_op="Aggregate (10)" from_port="example set output" to_op="Rename (30)" to_port="example set input"/>
+          <connect from_op="Rename (30)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="124" name="Add Polls &amp; Join" width="90" x="179" y="544">
+        <process expanded="true">
+          <operator activated="true" class="read_excel" compatibility="7.5.003" expanded="true" height="68" name="polls import" width="90" x="45" y="34">
+            <parameter key="excel_file" value="/Users/169495/Documents/president_primary_polls.xlsx"/>
+            <parameter key="sheet_number" value="1"/>
+            <parameter key="imported_cell_range" value="A1:AG18525"/>
+            <parameter key="encoding" value="SYSTEM"/>
+            <parameter key="first_row_as_names" value="false"/>
+            <list key="annotations">
+              <parameter key="0" value="Name"/>
+            </list>
+            <parameter key="date_format" value=""/>
+            <parameter key="time_zone" value="SYSTEM"/>
+            <parameter key="locale" value="English (United States)"/>
+            <list key="data_set_meta_data_information">
+              <parameter key="0" value="question_id.true.integer.attribute"/>
+              <parameter key="1" value="poll_id.true.integer.attribute"/>
+              <parameter key="2" value="cycle.true.integer.attribute"/>
+              <parameter key="3" value="state.true.polynominal.attribute"/>
+              <parameter key="4" value="pollster_id.true.integer.attribute"/>
+              <parameter key="5" value="pollster.true.polynominal.attribute"/>
+              <parameter key="6" value="sponsor_ids.true.integer.attribute"/>
+              <parameter key="7" value="sponsors.true.polynominal.attribute"/>
+              <parameter key="8" value="display_name.true.polynominal.attribute"/>
+              <parameter key="9" value="pollster_rating_id.true.integer.attribute"/>
+              <parameter key="10" value="pollster_rating_name.true.polynominal.attribute"/>
+              <parameter key="11" value="fte_grade.true.polynominal.attribute"/>
+              <parameter key="12" value="sample_size.true.integer.attribute"/>
+              <parameter key="13" value="population.true.polynominal.attribute"/>
+              <parameter key="14" value="population_full.true.polynominal.attribute"/>
+              <parameter key="15" value="methodology.true.polynominal.attribute"/>
+              <parameter key="16" value="office_type.true.polynominal.attribute"/>
+              <parameter key="17" value="start_date.true.date_time.attribute"/>
+              <parameter key="18" value="end_date.true.date_time.attribute"/>
+              <parameter key="19" value="sponsor_candidate.true.attribute_value.attribute"/>
+              <parameter key="20" value="internal.true.polynominal.attribute"/>
+              <parameter key="21" value="partisan.true.attribute_value.attribute"/>
+              <parameter key="22" value="tracking.true.polynominal.attribute"/>
+              <parameter key="23" value="nationwide_batch.true.polynominal.attribute"/>
+              <parameter key="24" value="created_at.true.date_time.attribute"/>
+              <parameter key="25" value="notes.true.polynominal.attribute"/>
+              <parameter key="26" value="url.true.polynominal.attribute"/>
+              <parameter key="27" value="stage.true.polynominal.attribute"/>
+              <parameter key="28" value="party.true.polynominal.attribute"/>
+              <parameter key="29" value="answer.true.polynominal.attribute"/>
+              <parameter key="30" value="candidate_id.true.integer.attribute"/>
+              <parameter key="31" value="candidate_name.true.polynominal.attribute"/>
+              <parameter key="32" value="pct.true.numeric.attribute"/>
+            </list>
+            <parameter key="read_not_matching_values_as_missings" value="true"/>
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+          </operator>
+          <operator activated="true" class="date_to_numerical" compatibility="7.5.003" expanded="true" height="82" name="Date to Numerical (4)" width="90" x="45" y="238">
+            <parameter key="attribute_name" value="Date"/>
+            <parameter key="time_unit" value="week"/>
+            <parameter key="millisecond_relative_to" value="second"/>
+            <parameter key="second_relative_to" value="minute"/>
+            <parameter key="minute_relative_to" value="hour"/>
+            <parameter key="hour_relative_to" value="day"/>
+            <parameter key="day_relative_to" value="month"/>
+            <parameter key="week_relative_to" value="year"/>
+            <parameter key="month_relative_to" value="year"/>
+            <parameter key="quarter_relative_to" value="year"/>
+            <parameter key="half_year_relative_to" value="year"/>
+            <parameter key="year_relative_to" value="era"/>
+            <parameter key="keep_old_attribute" value="false"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="103" name="Multiply" width="90" x="179" y="238"/>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples" width="90" x="313" y="340">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Date.gt.11"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="103" name="Multiply (2)" width="90" x="179" y="34"/>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (8)" width="90" x="179" y="493">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="state.is_not_missing."/>
+              <parameter key="filters_entry_key" value="end_date.gt.12/31/2019 1:00:00 PM"/>
+              <parameter key="filters_entry_key" value="answer.does_not_contain.Trump"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (6)" width="90" x="313" y="34">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="state.is_missing."/>
+              <parameter key="filters_entry_key" value="end_date.gt.12/31/2019 1:00:00 PM"/>
+              <parameter key="filters_entry_key" value="answer.does_not_contain.Trump"/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (9)" width="90" x="447" y="34">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="pct|answer|end_date"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="date_to_numerical" compatibility="7.5.003" expanded="true" height="82" name="Date to Numerical (3)" width="90" x="581" y="34">
+            <parameter key="attribute_name" value="end_date"/>
+            <parameter key="time_unit" value="week"/>
+            <parameter key="millisecond_relative_to" value="second"/>
+            <parameter key="second_relative_to" value="minute"/>
+            <parameter key="minute_relative_to" value="hour"/>
+            <parameter key="hour_relative_to" value="day"/>
+            <parameter key="day_relative_to" value="month"/>
+            <parameter key="week_relative_to" value="year"/>
+            <parameter key="month_relative_to" value="year"/>
+            <parameter key="quarter_relative_to" value="year"/>
+            <parameter key="half_year_relative_to" value="year"/>
+            <parameter key="year_relative_to" value="era"/>
+            <parameter key="keep_old_attribute" value="false"/>
+          </operator>
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (3)" width="90" x="313" y="238">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="left"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="Candidate" value="answer"/>
+              <parameter key="Date" value="end_date"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (6)" width="90" x="447" y="238">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="pct" value="average"/>
+              <parameter key="average_sentiment" value="average"/>
+              <parameter key="median_sentiment" value="average"/>
+              <parameter key="count_sentiment" value="sum"/>
+            </list>
+            <parameter key="group_by_attributes" value="Candidate|Date"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (7)" width="90" x="581" y="238">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="average(pct).is_not_missing."/>
+            </list>
+            <parameter key="filters_logic_and" value="true"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (5)" width="90" x="715" y="238">
+            <parameter key="old_name" value="average(pct)"/>
+            <parameter key="new_name" value="pct_avg"/>
+            <list key="rename_additional_attributes">
+              <parameter key="average(average_sentiment)" value="sentiment_average"/>
+              <parameter key="average(median_sentiment)" value="sentiment_median"/>
+              <parameter key="sum(count_sentiment)" value="sentiment_count"/>
+            </list>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (10)" width="90" x="313" y="493">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="pct|answer|end_date|state"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="date_to_numerical" compatibility="7.5.003" expanded="true" height="82" name="Date to Numerical (2)" width="90" x="447" y="493">
+            <parameter key="attribute_name" value="end_date"/>
+            <parameter key="time_unit" value="week"/>
+            <parameter key="millisecond_relative_to" value="second"/>
+            <parameter key="second_relative_to" value="minute"/>
+            <parameter key="minute_relative_to" value="hour"/>
+            <parameter key="hour_relative_to" value="day"/>
+            <parameter key="day_relative_to" value="month"/>
+            <parameter key="week_relative_to" value="year"/>
+            <parameter key="month_relative_to" value="year"/>
+            <parameter key="quarter_relative_to" value="year"/>
+            <parameter key="half_year_relative_to" value="year"/>
+            <parameter key="year_relative_to" value="era"/>
+            <parameter key="keep_old_attribute" value="false"/>
+          </operator>
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (9)" width="90" x="581" y="493">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="answer.contains.Biden"/>
+              <parameter key="filters_entry_key" value="answer.contains.Sanders"/>
+            </list>
+            <parameter key="filters_logic_and" value="false"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (6)" width="90" x="715" y="493">
+            <parameter key="old_name" value="end_date"/>
+            <parameter key="new_name" value="Date"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <connect from_port="in 1" to_op="Date to Numerical (4)" to_port="example set input"/>
+          <connect from_op="polls import" from_port="output" to_op="Multiply (2)" to_port="input"/>
+          <connect from_op="Date to Numerical (4)" from_port="example set output" to_op="Multiply" to_port="input"/>
+          <connect from_op="Multiply" from_port="output 1" to_op="Join (3)" to_port="left"/>
+          <connect from_op="Multiply" from_port="output 2" to_op="Filter Examples" to_port="example set input"/>
+          <connect from_op="Filter Examples" from_port="example set output" to_port="out 2"/>
+          <connect from_op="Multiply (2)" from_port="output 1" to_op="Filter Examples (6)" to_port="example set input"/>
+          <connect from_op="Multiply (2)" from_port="output 2" to_op="Filter Examples (8)" to_port="example set input"/>
+          <connect from_op="Filter Examples (8)" from_port="example set output" to_op="Select Attributes (10)" to_port="example set input"/>
+          <connect from_op="Filter Examples (6)" from_port="example set output" to_op="Select Attributes (9)" to_port="example set input"/>
+          <connect from_op="Select Attributes (9)" from_port="example set output" to_op="Date to Numerical (3)" to_port="example set input"/>
+          <connect from_op="Date to Numerical (3)" from_port="example set output" to_op="Join (3)" to_port="right"/>
+          <connect from_op="Join (3)" from_port="join" to_op="Aggregate (6)" to_port="example set input"/>
+          <connect from_op="Aggregate (6)" from_port="example set output" to_op="Filter Examples (7)" to_port="example set input"/>
+          <connect from_op="Filter Examples (7)" from_port="example set output" to_op="Rename (5)" to_port="example set input"/>
+          <connect from_op="Rename (5)" from_port="example set output" to_port="out 1"/>
+          <connect from_op="Select Attributes (10)" from_port="example set output" to_op="Date to Numerical (2)" to_port="example set input"/>
+          <connect from_op="Date to Numerical (2)" from_port="example set output" to_op="Filter Examples (9)" to_port="example set input"/>
+          <connect from_op="Filter Examples (9)" from_port="example set output" to_op="Rename (6)" to_port="example set input"/>
+          <connect from_op="Rename (6)" from_port="example set output" to_port="out 3"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+          <portSpacing port="sink_out 3" spacing="0"/>
+          <portSpacing port="sink_out 4" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="103" name="Scrape Impact - National" width="90" x="313" y="544">
+        <process expanded="true">
+          <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (11)" width="90" x="45" y="187">
+            <parameter key="parameter_expression" value=""/>
+            <parameter key="condition_class" value="custom_filters"/>
+            <parameter key="invert_filter" value="false"/>
+            <list key="filters_list">
+              <parameter key="filters_entry_key" value="Candidate.contains.Sanders"/>
+              <parameter key="filters_entry_key" value="Candidate.contains.Biden"/>
+            </list>
+            <parameter key="filters_logic_and" value="false"/>
+            <parameter key="filters_check_metadata" value="true"/>
+          </operator>
+          <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role (6)" width="90" x="45" y="34">
+            <parameter key="attribute_name" value="pct_avg"/>
+            <parameter key="target_role" value="label"/>
+            <list key="set_additional_roles"/>
+          </operator>
+          <operator activated="true" class="h2o:deep_learning" compatibility="7.5.000" expanded="true" height="82" name="Deep Learning" width="90" x="179" y="34">
+            <parameter key="activation" value="Tanh"/>
+            <enumeration key="hidden_layer_sizes">
+              <parameter key="hidden_layer_sizes" value="50"/>
+              <parameter key="hidden_layer_sizes" value="50"/>
+            </enumeration>
+            <enumeration key="hidden_dropout_ratios"/>
+            <parameter key="reproducible_(uses_1_thread)" value="true"/>
+            <parameter key="use_local_random_seed" value="false"/>
+            <parameter key="local_random_seed" value="1992"/>
+            <parameter key="epochs" value="20.0"/>
+            <parameter key="compute_variable_importances" value="false"/>
+            <parameter key="train_samples_per_iteration" value="-3"/>
+            <parameter key="adaptive_rate" value="true"/>
+            <parameter key="epsilon" value="1.0E-8"/>
+            <parameter key="rho" value="0.99"/>
+            <parameter key="learning_rate" value="0.005"/>
+            <parameter key="learning_rate_annealing" value="1.0E-6"/>
+            <parameter key="learning_rate_decay" value="1.0"/>
+            <parameter key="momentum_start" value="0.0"/>
+            <parameter key="momentum_ramp" value="1000000.0"/>
+            <parameter key="momentum_stable" value="0.0"/>
+            <parameter key="nesterov_accelerated_gradient" value="false"/>
+            <parameter key="standardize" value="true"/>
+            <parameter key="L1" value="1.0E-5"/>
+            <parameter key="L2" value="0.0"/>
+            <parameter key="max_w2" value="10.0"/>
+            <parameter key="loss_function" value="Automatic"/>
+            <parameter key="distribution_function" value="AUTO"/>
+            <parameter key="early_stopping" value="false"/>
+            <parameter key="stopping_rounds" value="1"/>
+            <parameter key="stopping_metric" value="AUTO"/>
+            <parameter key="stopping_tolerance" value="0.001"/>
+            <parameter key="missing_values_handling" value="MeanImputation"/>
+            <parameter key="max_runtime_seconds" value="0"/>
+            <list key="expert_parameters"/>
+            <list key="expert_parameters_"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (17)" width="90" x="179" y="187">
+            <parameter key="old_name" value="average_sentiment"/>
+            <parameter key="new_name" value="sentiment_average"/>
+            <list key="rename_additional_attributes">
+              <parameter key="median_sentiment" value="sentiment_median"/>
+              <parameter key="count_sentiment" value="sentiment_count"/>
+            </list>
+          </operator>
+          <operator activated="true" class="apply_model" compatibility="7.5.003" expanded="true" height="82" name="Apply Model (3)" width="90" x="313" y="34">
+            <list key="application_parameters"/>
+            <parameter key="create_view" value="false"/>
+          </operator>
+          <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role (7)" width="90" x="447" y="34">
+            <parameter key="attribute_name" value="prediction(pct_avg)"/>
+            <parameter key="target_role" value="regular"/>
+            <list key="set_additional_roles"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (19)" width="90" x="447" y="187">
+            <parameter key="old_name" value="prediction(pct_avg)"/>
+            <parameter key="new_name" value="nat_adj"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="103" name="Multiply (5)" width="90" x="45" y="340"/>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (5)" width="90" x="179" y="340">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="nat_adj" value="maximum"/>
+              <parameter key="nat_adj" value="minimum"/>
+              <parameter key="nat_adj" value="average"/>
+            </list>
+            <parameter key="group_by_attributes" value="Date"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes" width="90" x="313" y="340">
+            <list key="function_descriptions">
+              <parameter key="difference" value="[maximum(nat_adj)] - [minimum(nat_adj)]"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (6)" width="90" x="179" y="493">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="outer"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="Date" value="Date"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (4)" width="90" x="313" y="493">
+            <list key="function_descriptions">
+              <parameter key="Cand_adj" value="if([average(nat_adj)]&gt;[nat_adj],[difference]/2, -[difference]/2)"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes" width="90" x="447" y="493">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="candidate|Date|Candidate|cand_adj|Cand_adj"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <connect from_port="in 1" to_op="Set Role (6)" to_port="example set input"/>
+          <connect from_port="in 2" to_op="Filter Examples (11)" to_port="example set input"/>
+          <connect from_op="Filter Examples (11)" from_port="example set output" to_op="Rename (17)" to_port="example set input"/>
+          <connect from_op="Set Role (6)" from_port="example set output" to_op="Deep Learning" to_port="training set"/>
+          <connect from_op="Deep Learning" from_port="model" to_op="Apply Model (3)" to_port="model"/>
+          <connect from_op="Rename (17)" from_port="example set output" to_op="Apply Model (3)" to_port="unlabelled data"/>
+          <connect from_op="Apply Model (3)" from_port="labelled data" to_op="Set Role (7)" to_port="example set input"/>
+          <connect from_op="Set Role (7)" from_port="example set output" to_op="Rename (19)" to_port="example set input"/>
+          <connect from_op="Rename (19)" from_port="example set output" to_op="Multiply (5)" to_port="input"/>
+          <connect from_op="Multiply (5)" from_port="output 1" to_op="Aggregate (5)" to_port="example set input"/>
+          <connect from_op="Multiply (5)" from_port="output 2" to_op="Join (6)" to_port="right"/>
+          <connect from_op="Aggregate (5)" from_port="example set output" to_op="Generate Attributes" to_port="example set input"/>
+          <connect from_op="Generate Attributes" from_port="example set output" to_op="Join (6)" to_port="left"/>
+          <connect from_op="Join (6)" from_port="join" to_op="Generate Attributes (4)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (4)" from_port="example set output" to_op="Select Attributes" to_port="example set input"/>
+          <connect from_op="Select Attributes" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="source_in 3" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="103" name="Tradtional State Poll Model" width="90" x="313" y="697">
+        <process expanded="true">
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (3)" width="90" x="45" y="34">
+            <list key="function_descriptions">
+              <parameter key="state_answer" value="concat(state,&quot;_&quot;,answer)"/>
+              <parameter key="next" value="[Date]+1"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="124" name="Multiply (8)" width="90" x="179" y="34"/>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (8)" width="90" x="313" y="544">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="pct" value="average"/>
+            </list>
+            <parameter key="group_by_attributes" value="state|answer"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (8)" width="90" x="447" y="544">
+            <parameter key="old_name" value="state"/>
+            <parameter key="new_name" value="State"/>
+            <list key="rename_additional_attributes">
+              <parameter key="answer" value="Candidate"/>
+              <parameter key="average(pct)" value="Polling_Average"/>
+            </list>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="state list (2)" width="90" x="313" y="34">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="state_answer" value="count"/>
+            </list>
+            <parameter key="group_by_attributes" value="state_answer"/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (14)" width="90" x="447" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="state_answer"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="concurrency:loop_values" compatibility="7.5.003" expanded="true" height="103" name="loop states" width="90" x="313" y="187">
+            <parameter key="attribute" value="state_answer"/>
+            <parameter key="iteration_macro" value="loop_candidate"/>
+            <parameter key="reuse_results" value="false"/>
+            <parameter key="enable_parallel_execution" value="true"/>
+            <process expanded="true">
+              <operator activated="true" class="filter_examples" compatibility="7.5.003" expanded="true" height="103" name="Filter Examples (5)" width="90" x="45" y="34">
+                <parameter key="parameter_expression" value=""/>
+                <parameter key="condition_class" value="custom_filters"/>
+                <parameter key="invert_filter" value="false"/>
+                <list key="filters_list">
+                  <parameter key="filters_entry_key" value="state_answer.contains.%{loop_candidate}"/>
+                </list>
+                <parameter key="filters_logic_and" value="true"/>
+                <parameter key="filters_check_metadata" value="true"/>
+              </operator>
+              <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role (5)" width="90" x="179" y="34">
+                <parameter key="attribute_name" value="pct"/>
+                <parameter key="target_role" value="label"/>
+                <list key="set_additional_roles"/>
+              </operator>
+              <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="124" name="Multiply (10)" width="90" x="313" y="34"/>
+              <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (15)" width="90" x="447" y="136">
+                <parameter key="attribute_filter_type" value="subset"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value="next"/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+              </operator>
+              <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (7)" width="90" x="581" y="136">
+                <parameter key="use_default_aggregation" value="false"/>
+                <parameter key="attribute_filter_type" value="all"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value=""/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+                <parameter key="default_aggregation_function" value="average"/>
+                <list key="aggregation_attributes">
+                  <parameter key="next" value="maximum"/>
+                </list>
+                <parameter key="group_by_attributes" value=""/>
+                <parameter key="count_all_combinations" value="false"/>
+                <parameter key="only_distinct" value="false"/>
+                <parameter key="ignore_missings" value="true"/>
+              </operator>
+              <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (4)" width="90" x="447" y="238">
+                <parameter key="old_name" value="maximum(next)"/>
+                <parameter key="new_name" value="Date"/>
+                <list key="rename_additional_attributes"/>
+              </operator>
+              <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (16)" width="90" x="447" y="34">
+                <parameter key="attribute_filter_type" value="subset"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value="Date|pct"/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+              </operator>
+              <operator activated="true" class="polynomial_regression" compatibility="7.5.003" expanded="true" height="82" name="Polynomial Regression (2)" width="90" x="581" y="34">
+                <parameter key="max_iterations" value="5000"/>
+                <parameter key="replication_factor" value="1"/>
+                <parameter key="max_degree" value="5"/>
+                <parameter key="min_coefficient" value="-100.0"/>
+                <parameter key="max_coefficient" value="100.0"/>
+                <parameter key="use_local_random_seed" value="false"/>
+                <parameter key="local_random_seed" value="1992"/>
+              </operator>
+              <operator activated="true" class="apply_model" compatibility="7.5.003" expanded="true" height="82" name="Apply Model (4)" width="90" x="715" y="289">
+                <list key="application_parameters"/>
+                <parameter key="create_view" value="false"/>
+              </operator>
+              <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role (8)" width="90" x="313" y="442">
+                <parameter key="attribute_name" value="pct"/>
+                <parameter key="target_role" value="regular"/>
+                <list key="set_additional_roles"/>
+              </operator>
+              <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (17)" width="90" x="447" y="442">
+                <parameter key="attribute_filter_type" value="subset"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value="state|answer|next"/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+              </operator>
+              <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (16)" width="90" x="581" y="442">
+                <parameter key="old_name" value="next"/>
+                <parameter key="new_name" value="Date"/>
+                <list key="rename_additional_attributes"/>
+              </operator>
+              <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (5)" width="90" x="715" y="442">
+                <parameter key="remove_double_attributes" value="true"/>
+                <parameter key="join_type" value="inner"/>
+                <parameter key="use_id_attribute_as_key" value="false"/>
+                <list key="key_attributes">
+                  <parameter key="Date" value="Date"/>
+                </list>
+                <parameter key="keep_both_join_attributes" value="false"/>
+              </operator>
+              <operator activated="true" class="remove_duplicates" compatibility="7.5.003" expanded="true" height="103" name="Remove Duplicates (2)" width="90" x="447" y="595">
+                <parameter key="attribute_filter_type" value="all"/>
+                <parameter key="attribute" value=""/>
+                <parameter key="attributes" value=""/>
+                <parameter key="use_except_expression" value="false"/>
+                <parameter key="value_type" value="attribute_value"/>
+                <parameter key="use_value_type_exception" value="false"/>
+                <parameter key="except_value_type" value="time"/>
+                <parameter key="block_type" value="attribute_block"/>
+                <parameter key="use_block_type_exception" value="false"/>
+                <parameter key="except_block_type" value="value_matrix_row_start"/>
+                <parameter key="invert_selection" value="false"/>
+                <parameter key="include_special_attributes" value="false"/>
+                <parameter key="treat_missing_values_as_duplicates" value="false"/>
+              </operator>
+              <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role (9)" width="90" x="581" y="595">
+                <parameter key="attribute_name" value="prediction(pct)"/>
+                <parameter key="target_role" value="regular"/>
+                <list key="set_additional_roles"/>
+              </operator>
+              <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (21)" width="90" x="715" y="595">
+                <parameter key="old_name" value="prediction(pct)"/>
+                <parameter key="new_name" value="forecast"/>
+                <list key="rename_additional_attributes"/>
+              </operator>
+              <connect from_port="input 2" to_op="Filter Examples (5)" to_port="example set input"/>
+              <connect from_op="Filter Examples (5)" from_port="example set output" to_op="Set Role (5)" to_port="example set input"/>
+              <connect from_op="Set Role (5)" from_port="example set output" to_op="Multiply (10)" to_port="input"/>
+              <connect from_op="Multiply (10)" from_port="output 1" to_op="Select Attributes (16)" to_port="example set input"/>
+              <connect from_op="Multiply (10)" from_port="output 2" to_op="Select Attributes (15)" to_port="example set input"/>
+              <connect from_op="Multiply (10)" from_port="output 3" to_op="Set Role (8)" to_port="example set input"/>
+              <connect from_op="Select Attributes (15)" from_port="example set output" to_op="Aggregate (7)" to_port="example set input"/>
+              <connect from_op="Aggregate (7)" from_port="example set output" to_op="Rename (4)" to_port="example set input"/>
+              <connect from_op="Rename (4)" from_port="example set output" to_op="Apply Model (4)" to_port="unlabelled data"/>
+              <connect from_op="Select Attributes (16)" from_port="example set output" to_op="Polynomial Regression (2)" to_port="training set"/>
+              <connect from_op="Polynomial Regression (2)" from_port="model" to_op="Apply Model (4)" to_port="model"/>
+              <connect from_op="Apply Model (4)" from_port="labelled data" to_op="Join (5)" to_port="left"/>
+              <connect from_op="Set Role (8)" from_port="example set output" to_op="Select Attributes (17)" to_port="example set input"/>
+              <connect from_op="Select Attributes (17)" from_port="example set output" to_op="Rename (16)" to_port="example set input"/>
+              <connect from_op="Rename (16)" from_port="example set output" to_op="Join (5)" to_port="right"/>
+              <connect from_op="Join (5)" from_port="join" to_op="Remove Duplicates (2)" to_port="example set input"/>
+              <connect from_op="Remove Duplicates (2)" from_port="example set output" to_op="Set Role (9)" to_port="example set input"/>
+              <connect from_op="Set Role (9)" from_port="example set output" to_op="Rename (21)" to_port="example set input"/>
+              <connect from_op="Rename (21)" from_port="example set output" to_port="output 1"/>
+              <portSpacing port="source_input 1" spacing="0"/>
+              <portSpacing port="source_input 2" spacing="0"/>
+              <portSpacing port="source_input 3" spacing="0"/>
+              <portSpacing port="sink_output 1" spacing="0"/>
+              <portSpacing port="sink_output 2" spacing="0"/>
+            </process>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="82" name="Append (4)" width="90" x="447" y="187">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <operator activated="true" class="read_excel" compatibility="7.5.003" expanded="true" height="68" name="super tuesday results" width="90" x="447" y="289">
+            <parameter key="excel_file" value="/Users/169495/Documents/super_tuesday_results.xlsx"/>
+            <parameter key="sheet_number" value="1"/>
+            <parameter key="imported_cell_range" value="A1:E29"/>
+            <parameter key="encoding" value="SYSTEM"/>
+            <parameter key="first_row_as_names" value="false"/>
+            <list key="annotations">
+              <parameter key="0" value="Name"/>
+            </list>
+            <parameter key="date_format" value=""/>
+            <parameter key="time_zone" value="SYSTEM"/>
+            <parameter key="locale" value="English (United States)"/>
+            <list key="data_set_meta_data_information">
+              <parameter key="0" value="state.true.polynominal.attribute"/>
+              <parameter key="1" value="answer.true.polynominal.attribute"/>
+              <parameter key="2" value="result.true.numeric.attribute"/>
+              <parameter key="3" value="delegates.true.integer.attribute"/>
+              <parameter key="4" value="Total Delegates.true.integer.attribute"/>
+            </list>
+            <parameter key="read_not_matching_values_as_missings" value="true"/>
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+          </operator>
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join" width="90" x="648" y="187">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="inner"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="state" value="state"/>
+              <parameter key="answer" value="answer"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <connect from_port="in 1" to_op="Generate Attributes (3)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (3)" from_port="example set output" to_op="Multiply (8)" to_port="input"/>
+          <connect from_op="Multiply (8)" from_port="output 1" to_op="state list (2)" to_port="example set input"/>
+          <connect from_op="Multiply (8)" from_port="output 2" to_op="loop states" to_port="input 2"/>
+          <connect from_op="Multiply (8)" from_port="output 3" to_op="Aggregate (8)" to_port="example set input"/>
+          <connect from_op="Aggregate (8)" from_port="example set output" to_op="Rename (8)" to_port="example set input"/>
+          <connect from_op="Rename (8)" from_port="example set output" to_port="out 2"/>
+          <connect from_op="state list (2)" from_port="example set output" to_op="Select Attributes (14)" to_port="example set input"/>
+          <connect from_op="Select Attributes (14)" from_port="example set output" to_op="loop states" to_port="input 1"/>
+          <connect from_op="loop states" from_port="output 1" to_op="Append (4)" to_port="example set 1"/>
+          <connect from_op="Append (4)" from_port="merged set" to_op="Join" to_port="left"/>
+          <connect from_op="super tuesday results" from_port="output" to_op="Join" to_port="right"/>
+          <connect from_op="Join" from_port="join" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+          <portSpacing port="sink_out 3" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="124" name="Join &amp; Enrich" width="90" x="447" y="544">
+        <process expanded="true">
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (8)" width="90" x="112" y="34">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="outer"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="Candidate" value="answer"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (6)" width="90" x="246" y="34">
+            <list key="function_descriptions">
+              <parameter key="forecast_with_scrape" value="[forecast] + [Cand_adj]"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (12)" width="90" x="380" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Cand_adj"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (15)" width="90" x="514" y="34">
+            <parameter key="old_name" value="state"/>
+            <parameter key="new_name" value="State"/>
+            <list key="rename_additional_attributes">
+              <parameter key="forecast" value="Forecast"/>
+              <parameter key="forecast_with_scrape" value="Forecast_with_Scrape"/>
+              <parameter key="result" value="Result"/>
+            </list>
+          </operator>
+          <operator activated="true" class="join" compatibility="7.5.003" expanded="true" height="82" name="Join (9)" width="90" x="112" y="187">
+            <parameter key="remove_double_attributes" value="true"/>
+            <parameter key="join_type" value="inner"/>
+            <parameter key="use_id_attribute_as_key" value="false"/>
+            <list key="key_attributes">
+              <parameter key="State" value="State"/>
+              <parameter key="Candidate" value="Candidate"/>
+            </list>
+            <parameter key="keep_both_join_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="order_attributes" compatibility="7.5.003" expanded="true" height="82" name="Reorder Attributes (2)" width="90" x="112" y="289">
+            <parameter key="sort_mode" value="user specified"/>
+            <parameter key="attribute_ordering" value="Date|Candidate|State|Polling_Average|Forecast|Forecast_with_Scrape|Result"/>
+            <parameter key="use_regular_expressions" value="false"/>
+            <parameter key="handle_unmatched" value="append"/>
+            <parameter key="sort_direction" value="ascending"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (29)" width="90" x="246" y="289">
+            <parameter key="old_name" value="delegates"/>
+            <parameter key="new_name" value="Delegates"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="multiply" compatibility="7.5.003" expanded="true" height="187" name="Multiply (6)" width="90" x="380" y="187"/>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (20)" width="90" x="514" y="697">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="Date|Candidate|State|Result|Total Delegates"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (10)" width="90" x="648" y="697">
+            <list key="function_descriptions">
+              <parameter key="Metric" value="&quot;Result&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (25)" width="90" x="782" y="697">
+            <parameter key="old_name" value="Result"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (19)" width="90" x="514" y="595">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="Date|Candidate|State|Forecast_with_Scrape|Total Delegates"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (9)" width="90" x="648" y="595">
+            <list key="function_descriptions">
+              <parameter key="Metric" value="&quot;Forecast_with_Scrape&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (24)" width="90" x="782" y="595">
+            <parameter key="old_name" value="Forecast_with_Scrape"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (18)" width="90" x="514" y="493">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="Date|Candidate|State|Forecast|Total Delegates"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (8)" width="90" x="648" y="493">
+            <list key="function_descriptions">
+              <parameter key="Metric" value="&quot;Forecast&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (23)" width="90" x="782" y="493">
+            <parameter key="old_name" value="Forecast"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (13)" width="90" x="514" y="391">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="Date|Candidate|State|Polling_Average|Total Delegates"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (7)" width="90" x="648" y="391">
+            <list key="function_descriptions">
+              <parameter key="Metric" value="&quot;Polling_Average&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (22)" width="90" x="782" y="391">
+            <parameter key="old_name" value="Polling_Average"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (21)" width="90" x="514" y="799">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="Date|Candidate|State|Delegates|Total Delegates"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (21)" width="90" x="648" y="799">
+            <list key="function_descriptions">
+              <parameter key="Metric" value="&quot;Delegates&quot;"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (27)" width="90" x="782" y="799">
+            <parameter key="old_name" value="Delegates"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <operator activated="true" class="append" compatibility="7.5.003" expanded="true" height="166" name="Append" width="90" x="916" y="391">
+            <parameter key="datamanagement" value="double_array"/>
+            <parameter key="data_management" value="auto"/>
+            <parameter key="merge_type" value="all"/>
+          </operator>
+          <connect from_port="in 1" to_op="Join (8)" to_port="left"/>
+          <connect from_port="in 2" to_op="Join (8)" to_port="right"/>
+          <connect from_port="in 3" to_op="Join (9)" to_port="left"/>
+          <connect from_op="Join (8)" from_port="join" to_op="Generate Attributes (6)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (6)" from_port="example set output" to_op="Select Attributes (12)" to_port="example set input"/>
+          <connect from_op="Select Attributes (12)" from_port="example set output" to_op="Rename (15)" to_port="example set input"/>
+          <connect from_op="Rename (15)" from_port="example set output" to_op="Join (9)" to_port="right"/>
+          <connect from_op="Join (9)" from_port="join" to_op="Reorder Attributes (2)" to_port="example set input"/>
+          <connect from_op="Reorder Attributes (2)" from_port="example set output" to_op="Rename (29)" to_port="example set input"/>
+          <connect from_op="Rename (29)" from_port="example set output" to_op="Multiply (6)" to_port="input"/>
+          <connect from_op="Multiply (6)" from_port="output 1" to_op="Select Attributes (13)" to_port="example set input"/>
+          <connect from_op="Multiply (6)" from_port="output 2" to_op="Select Attributes (18)" to_port="example set input"/>
+          <connect from_op="Multiply (6)" from_port="output 3" to_op="Select Attributes (19)" to_port="example set input"/>
+          <connect from_op="Multiply (6)" from_port="output 4" to_op="Select Attributes (20)" to_port="example set input"/>
+          <connect from_op="Multiply (6)" from_port="output 5" to_port="out 1"/>
+          <connect from_op="Multiply (6)" from_port="output 6" to_op="Select Attributes (21)" to_port="example set input"/>
+          <connect from_op="Select Attributes (20)" from_port="example set output" to_op="Generate Attributes (10)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (10)" from_port="example set output" to_op="Rename (25)" to_port="example set input"/>
+          <connect from_op="Rename (25)" from_port="example set output" to_op="Append" to_port="example set 4"/>
+          <connect from_op="Select Attributes (19)" from_port="example set output" to_op="Generate Attributes (9)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (9)" from_port="example set output" to_op="Rename (24)" to_port="example set input"/>
+          <connect from_op="Rename (24)" from_port="example set output" to_op="Append" to_port="example set 3"/>
+          <connect from_op="Select Attributes (18)" from_port="example set output" to_op="Generate Attributes (8)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (8)" from_port="example set output" to_op="Rename (23)" to_port="example set input"/>
+          <connect from_op="Rename (23)" from_port="example set output" to_op="Append" to_port="example set 2"/>
+          <connect from_op="Select Attributes (13)" from_port="example set output" to_op="Generate Attributes (7)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (7)" from_port="example set output" to_op="Rename (22)" to_port="example set input"/>
+          <connect from_op="Rename (22)" from_port="example set output" to_op="Append" to_port="example set 1"/>
+          <connect from_op="Select Attributes (21)" from_port="example set output" to_op="Generate Attributes (21)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (21)" from_port="example set output" to_op="Rename (27)" to_port="example set input"/>
+          <connect from_op="Rename (27)" from_port="example set output" to_op="Append" to_port="example set 5"/>
+          <connect from_op="Append" from_port="merged set" to_port="out 2"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="source_in 3" spacing="0"/>
+          <portSpacing port="source_in 4" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+          <portSpacing port="sink_out 3" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="7.5.003" expanded="true" height="82" name="Success Metrics" width="90" x="581" y="493">
+        <process expanded="true">
+          <operator activated="true" class="generate_attributes" compatibility="7.5.003" expanded="true" height="82" name="Generate Attributes (5)" width="90" x="45" y="34">
+            <list key="function_descriptions">
+              <parameter key="Poll_Avg_Diff" value="abs([Result]-[Polling_Average])"/>
+              <parameter key="Traditional_Diff" value="abs([Result]-[Forecast])"/>
+              <parameter key="Scrape_Diff" value="abs([Result]-[Forecast_with_Scrape])"/>
+            </list>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="7.5.003" expanded="true" height="82" name="Select Attributes (11)" width="90" x="179" y="34">
+            <parameter key="attribute_filter_type" value="subset"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value="State|Date"/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <operator activated="true" class="aggregate" compatibility="7.5.003" expanded="true" height="82" name="Aggregate (9)" width="90" x="313" y="34">
+            <parameter key="use_default_aggregation" value="false"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="default_aggregation_function" value="average"/>
+            <list key="aggregation_attributes">
+              <parameter key="Poll_Avg_Diff" value="average"/>
+              <parameter key="Poll_Avg_Diff" value="minimum"/>
+              <parameter key="Poll_Avg_Diff" value="maximum"/>
+              <parameter key="Poll_Avg_Diff" value="median"/>
+              <parameter key="Traditional_Diff" value="average"/>
+              <parameter key="Traditional_Diff" value="minimum"/>
+              <parameter key="Traditional_Diff" value="maximum"/>
+              <parameter key="Traditional_Diff" value="median"/>
+              <parameter key="Scrape_Diff" value="average"/>
+              <parameter key="Scrape_Diff" value="minimum"/>
+              <parameter key="Scrape_Diff" value="maximum"/>
+              <parameter key="Scrape_Diff" value="median"/>
+              <parameter key="Poll_Avg_Diff" value="standard_deviation"/>
+              <parameter key="Traditional_Diff" value="standard_deviation"/>
+              <parameter key="Scrape_Diff" value="standard_deviation"/>
+            </list>
+            <parameter key="group_by_attributes" value=""/>
+            <parameter key="count_all_combinations" value="false"/>
+            <parameter key="only_distinct" value="false"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="transpose" compatibility="7.5.003" expanded="true" height="82" name="Transpose" width="90" x="447" y="34"/>
+          <operator activated="true" class="set_role" compatibility="7.5.003" expanded="true" height="82" name="Set Role" width="90" x="581" y="34">
+            <parameter key="attribute_name" value="id"/>
+            <parameter key="target_role" value="regular"/>
+            <list key="set_additional_roles"/>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace" width="90" x="45" y="187">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="[(]"/>
+            <parameter key="replace_by" value="&amp;"/>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace (3)" width="90" x="179" y="187">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="[)]"/>
+          </operator>
+          <operator activated="true" class="split" compatibility="7.5.003" expanded="true" height="82" name="Split" width="90" x="313" y="187">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="split_pattern" value="&amp;"/>
+            <parameter key="split_mode" value="ordered_split"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (7)" width="90" x="447" y="187">
+            <parameter key="old_name" value="id_1"/>
+            <parameter key="new_name" value="Metric"/>
+            <list key="rename_additional_attributes">
+              <parameter key="id_2" value="Method"/>
+            </list>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace (4)" width="90" x="581" y="187">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="Poll_Avg_Diff"/>
+            <parameter key="replace_by" value="Poll Average"/>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace (5)" width="90" x="45" y="340">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="Traditional_Diff"/>
+            <parameter key="replace_by" value="Traditional Model"/>
+          </operator>
+          <operator activated="true" class="replace" compatibility="7.5.003" expanded="true" height="82" name="Replace (6)" width="90" x="179" y="340">
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="nominal"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="file_path"/>
+            <parameter key="block_type" value="single_value"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="single_value"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <parameter key="replace_what" value="Scrape_Diff"/>
+            <parameter key="replace_by" value="Scrape Model"/>
+          </operator>
+          <operator activated="true" class="rename" compatibility="7.5.003" expanded="true" height="82" name="Rename (26)" width="90" x="313" y="340">
+            <parameter key="old_name" value="att_1"/>
+            <parameter key="new_name" value="Value"/>
+            <list key="rename_additional_attributes"/>
+          </operator>
+          <connect from_port="in 1" to_op="Generate Attributes (5)" to_port="example set input"/>
+          <connect from_op="Generate Attributes (5)" from_port="example set output" to_op="Select Attributes (11)" to_port="example set input"/>
+          <connect from_op="Select Attributes (11)" from_port="example set output" to_op="Aggregate (9)" to_port="example set input"/>
+          <connect from_op="Aggregate (9)" from_port="example set output" to_op="Transpose" to_port="example set input"/>
+          <connect from_op="Transpose" from_port="example set output" to_op="Set Role" to_port="example set input"/>
+          <connect from_op="Set Role" from_port="example set output" to_op="Replace" to_port="example set input"/>
+          <connect from_op="Replace" from_port="example set output" to_op="Replace (3)" to_port="example set input"/>
+          <connect from_op="Replace (3)" from_port="example set output" to_op="Split" to_port="example set input"/>
+          <connect from_op="Split" from_port="example set output" to_op="Rename (7)" to_port="example set input"/>
+          <connect from_op="Rename (7)" from_port="example set output" to_op="Replace (4)" to_port="example set input"/>
+          <connect from_op="Replace (4)" from_port="example set output" to_op="Replace (5)" to_port="example set input"/>
+          <connect from_op="Replace (5)" from_port="example set output" to_op="Replace (6)" to_port="example set input"/>
+          <connect from_op="Replace (6)" from_port="example set output" to_op="Rename (26)" to_port="example set input"/>
+          <connect from_op="Rename (26)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="write_excel" compatibility="7.5.003" expanded="true" height="82" name="Write Excel (3)" width="90" x="715" y="799">
+        <parameter key="excel_file" value="/Users/169495/Documents/Social_Data.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="true" class="write_excel" compatibility="7.5.003" expanded="true" height="82" name="Write Excel" width="90" x="715" y="697">
+        <parameter key="excel_file" value="/Users/169495/Documents/Election_Data.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="true" class="write_excel" compatibility="7.5.003" expanded="true" height="82" name="Write Excel (2)" width="90" x="715" y="595">
+        <parameter key="excel_file" value="/Users/169495/Documents/Model_Efficacy_Data.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <connect from_op="Add Sentiment" from_port="out 1" to_op="Join &amp; Aggregate" to_port="in 2"/>
+      <connect from_op="Enrich Data" from_port="out 1" to_op="Join &amp; Aggregate" to_port="in 1"/>
+      <connect from_op="Data ETL" from_port="out 1" to_op="Add Polls &amp; Join" to_port="in 1"/>
+      <connect from_op="Data ETL" from_port="out 2" to_op="sentiment viz" to_port="in 1"/>
+      <connect from_op="sentiment viz" from_port="out 1" to_op="Write Excel (3)" to_port="input"/>
+      <connect from_op="Add Polls &amp; Join" from_port="out 1" to_op="Scrape Impact - National" to_port="in 1"/>
+      <connect from_op="Add Polls &amp; Join" from_port="out 2" to_op="Scrape Impact - National" to_port="in 2"/>
+      <connect from_op="Add Polls &amp; Join" from_port="out 3" to_op="Tradtional State Poll Model" to_port="in 1"/>
+      <connect from_op="Scrape Impact - National" from_port="out 1" to_op="Join &amp; Enrich" to_port="in 1"/>
+      <connect from_op="Tradtional State Poll Model" from_port="out 1" to_op="Join &amp; Enrich" to_port="in 2"/>
+      <connect from_op="Tradtional State Poll Model" from_port="out 2" to_op="Join &amp; Enrich" to_port="in 3"/>
+      <connect from_op="Join &amp; Enrich" from_port="out 1" to_op="Success Metrics" to_port="in 1"/>
+      <connect from_op="Join &amp; Enrich" from_port="out 2" to_op="Write Excel" to_port="input"/>
+      <connect from_op="Success Metrics" from_port="out 1" to_op="Write Excel (2)" to_port="input"/>
+      <connect from_op="Write Excel (3)" from_port="through" to_port="result 3"/>
+      <connect from_op="Write Excel" from_port="through" to_port="result 1"/>
+      <connect from_op="Write Excel (2)" from_port="through" to_port="result 2"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+      <portSpacing port="sink_result 4" spacing="0"/>
+      <description align="center" color="yellow" colored="false" height="164" resized="true" width="157" x="23" y="16">News websites scraped and 5-gramed here.</description>
+      <description align="center" color="yellow" colored="false" height="245" resized="true" width="376" x="24" y="191">News website data enriched with sentiment data from AFINN sentiment wordlist library.</description>
+      <description align="center" color="yellow" colored="false" height="226" resized="true" width="122" x="28" y="444">Sentiment data ETLed in preparation for visualization and for joining to Polls</description>
+      <description align="center" color="yellow" colored="false" height="234" resized="true" width="119" x="165" y="448">Polls Added to data-set</description>
+      <description align="center" color="yellow" colored="false" height="222" resized="true" width="122" x="299" y="455">Scraped data model generated here</description>
+      <description align="right" color="yellow" colored="false" height="127" resized="true" width="267" x="285" y="686">Traditional model &lt;br/&gt;generated here &lt;br/&gt;for comparison</description>
+      <description align="center" color="yellow" colored="false" height="215" resized="true" width="124" x="432" y="466">Preparation for visualization</description>
+      <description align="center" color="yellow" colored="false" height="196" resized="true" width="147" x="83" y="697">Preparation for vizualization</description>
+      <description align="center" color="yellow" colored="false" height="201" resized="true" width="117" x="570" y="402">Running Model Metrics for Comparison for Visualization</description>
+      <description align="center" color="yellow" colored="false" height="430" resized="true" width="133" x="696" y="469">Writing Excel files for Tableau - when operationalized these would be to a general database</description>
+    </process>
+  </operator>
+</process>
